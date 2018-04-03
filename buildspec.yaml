@@ -1,0 +1,24 @@
+version: 0.2 
+
+phases: 
+  install: 
+    commands: 
+      - echo Installing docker-compose 
+      - curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+      - chmox +x /usr/local/bin/docker-compose
+  build: 
+    commands: 
+      - echo Building docker image
+      - cat docker-compose.yml | sed 's/build: \./build: $IMAGE_REPO:$IMAGE_TAG/g' > docker-compose-test.yml
+      - docker build -t $IMAGE_REPO:$IMAGE_TAG .
+      - docker-compose -f docker-compose-test.yml run web sh run-test.sh 
+      - docker tag $IMAGE_REPO:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO
+  post_build: 
+    commands: 
+      - echo Build completed on `date` 
+      - echo Pushing docker image 
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO:$IMAGE_TAG
+        
+
+
+        
