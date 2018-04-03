@@ -12,7 +12,7 @@ phases:
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build: 
     commands:
-      - IMAGE_TAG=$(cut -c1-6 $CODEBUILD_RESOLVED_SOURCE_VERSION) 
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-6) 
       - echo Building docker image
       - "cat docker-compose.yml | sed 's/build: \\./build: $IMAGE_REPO:$IMAGE_TAG/g' > docker-compose-test.yml"
       - docker build -t $IMAGE_REPO:$IMAGE_TAG .
