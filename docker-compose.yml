@@ -1,0 +1,30 @@
+version: '2.1'
+services:
+  db: 
+    image: mysql 
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: develop
+      MYSQL_DATABASE: develop
+      MYSQL_USER: develop
+      MYSQL_PASSWORD: develop
+      MYSQL_ROOT_HOSTNAME: 127.0.0.1
+    ports: 
+      - "3306:3306" 
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+  web: 
+    build: . 
+    command: sh run-dev.sh
+    volumes: 
+      - ./:/app 
+    ports: 
+      - "3000:3000"
+    depends_on:
+      db: 
+        condition: service_healthy 
+
+
+
