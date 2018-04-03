@@ -17,7 +17,7 @@ phases:
       - "cat docker-compose.yml | sed 's/build: \\./image: $IMAGE_REPO:$IMAGE_TAG/g' > docker-compose-test.yml"
       - docker build -t $IMAGE_REPO:$IMAGE_TAG .
       - docker-compose -f docker-compose-test.yml up -d && docker-compose -f docker-compose-test.yml run web sh run-test.sh --abort-on-container-exit 
-      - docker tag $IMAGE_REPO:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO
+      - docker tag $IMAGE_REPO:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO:$IMAGE_TAG
   post_build: 
     commands: 
       - echo Build completed on `date` 
