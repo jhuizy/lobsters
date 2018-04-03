@@ -5,11 +5,16 @@ phases:
     commands: 
       - echo Installing docker-compose 
       - curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-      - chmox +x /usr/local/bin/docker-compose
-  build: 
+      - chmod +x /usr/local/bin/docker-compose
+  pre_build: 
     commands: 
+      - echo Logging into ECR
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+  build: 
+    commands:
+      - IMAGE_TAG=$(cut -c1-6 $CODEBUILD_RESOLVED_SOURCE_VERSION) 
       - echo Building docker image
-      - cat docker-compose.yml | sed 's/build: \./build: $IMAGE_REPO:$IMAGE_TAG/g' > docker-compose-test.yml
+      - cat docker-compose.yml | sed "s/build: \./build: $IMAGE_REPO:$IMAGE_TAG/g" > docker-compose-test.yml
       - docker build -t $IMAGE_REPO:$IMAGE_TAG .
       - docker-compose -f docker-compose-test.yml run web sh run-test.sh 
       - docker tag $IMAGE_REPO:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO
