@@ -1,0 +1,19 @@
+development:
+  adapter: mysql2
+  encoding: utf8mb4
+  reconnect: false
+  database: develop
+  username: develop
+  password: develop
+  host: db
+  port: 3306
+  
+test:
+  adapter: mysql2
+  encoding: utf8mb4
+  reconnect: false
+  database: test
+  username: test 
+  password: test 
+  host: db
+  port: 3306
