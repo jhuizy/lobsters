@@ -1,0 +1,8 @@
+{
+  "Parameters": {
+    "EcrRepo": "ECR_REPO_REPLACE_ME",
+    "TemplatePath": "TEMPLATE_PATH_REPLACE_ME",
+    "ImageTag": "IMAGE_TAG_REPLACE_ME"
+  }
+}
+
