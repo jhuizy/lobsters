@@ -55,6 +55,7 @@ Resources:
                   Essential: true
                   Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrRepo}:${ImageTag}
                   Memory: 128
+                  Command: rails server
                   PortMappings:
                     - ContainerPort: 3000
                   LogConfiguration:

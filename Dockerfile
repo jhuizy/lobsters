@@ -7,4 +7,3 @@ COPY Gemfile .
 COPY Gemfile.lock .
 RUN bundle install
 COPY . .
-CMD ["rails", "server"] 
