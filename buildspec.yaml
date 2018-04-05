@@ -23,6 +23,9 @@ phases:
       - echo Build completed on `date` 
       - echo Pushing docker image 
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO:$IMAGE_TAG
+      - echo Updating SSM parameter
+      - STACK_NAME=lobsters-app
+      - aws ssm put-parameter --name "/$STACK_NAME/image" --value $IMAGE_TAG --type String --overwrite --region $AWS_DEFAULT_REGION
         
 
 
