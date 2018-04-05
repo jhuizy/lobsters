@@ -18,9 +18,6 @@ environment_variables:
       config-prod.json
 
 phases:
-  install:
-    commands:
-      npm install jsonlint -g
   pre_build:
     commands:
       - echo "Validating CFN templates"
@@ -28,11 +25,6 @@ phases:
         for cfn_template in $TEMPLATE_FILES; do
           echo "Validating CloudFormation template file $cfn_template"
           aws cloudformation validate-template --template-body file://$cfn_template
-        done
-      - |
-        for conf in $CONFIG_FILES; do
-          echo "Validating CFN parameters config file $conf"
-          jsonlint -q $conf
         done
   build:
     commands:
