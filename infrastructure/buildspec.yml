@@ -29,13 +29,14 @@ phases:
   build:
     commands:
       - echo "Fetching image tag"
+      - STACK_NAME=lobsters-app
       - IMAGE_TAG=$(aws ssm get-parameter --names "/$STACK_NAME/image" --query "Parameters[0].Value" --output text)
       - echo "Copying child stack templates to S3"
       - |
         for child_template in $CHILD_TEMPLATES; do
           aws s3 cp "$child_template" "s3://$TEMPLATE_BUCKET/$child_template"
         done
-      - aws cloudformation deploy --template-file master.yml --stack-name lobsters-app --paramter-overrides TemplatePath=$TEMPLATE_BUCKET ImageTag=$IMAGE_TAG EcrRepo=$ECR_REPO --capabilities CAPABILITY_NAMED_IAM
+      - aws cloudformation deploy --template-file master.yml --stack-name $STACK_NAME --paramter-overrides TemplatePath=$TEMPLATE_BUCKET ImageTag=$IMAGE_TAG EcrRepo=$ECR_REPO --capabilities CAPABILITY_NAMED_IAM
       # - echo "Updating template configurtion files to use the appropriate values"
       # - |
       #   for conf in $CONFIG_FILES; do
