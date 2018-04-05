@@ -24,7 +24,7 @@ phases:
       - |
         for cfn_template in $TEMPLATE_FILES; do
           echo "Validating CloudFormation template file $cfn_template"
-          aws cloudformation validate-template --template-body file://$cfn_template
+          aws cloudformation validate-template --template-body file://infrastructure/$cfn_template
         done
   build:
     commands:
@@ -34,9 +34,9 @@ phases:
       - echo "Copying child stack templates to S3"
       - |
         for child_template in $CHILD_TEMPLATES; do
-          aws s3 cp "$child_template" "s3://$TEMPLATE_BUCKET/$child_template"
+          aws s3 cp "infrastructure/$child_template" "s3://$TEMPLATE_BUCKET/$child_template"
         done
-      - aws cloudformation deploy --template-file master.yml --stack-name $STACK_NAME --paramter-overrides TemplatePath=$TEMPLATE_BUCKET ImageTag=$IMAGE_TAG EcrRepo=$ECR_REPO --capabilities CAPABILITY_NAMED_IAM
+      - aws cloudformation deploy --template-file infrastructure/master.yml --stack-name $STACK_NAME --paramter-overrides TemplatePath=$TEMPLATE_BUCKET ImageTag=$IMAGE_TAG EcrRepo=$ECR_REPO --capabilities CAPABILITY_NAMED_IAM
       # - echo "Updating template configurtion files to use the appropriate values"
       # - |
       #   for conf in $CONFIG_FILES; do
