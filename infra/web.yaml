@@ -1,0 +1,123 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web-lobsters
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: web
+        app: lobsters
+    spec:
+      containers:
+        - name: web-lobsters
+          image: lobsters/web:1.0.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: RACK_ENV
+              value: production
+            - name: DB_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: db_db
+            - name: DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: lobstesr
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: db_password
+            - name: DB_HOST
+              value: lobsters-db
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: secret_key_base
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: db-lobsters
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: db
+        app: lobsters
+    spec:
+      containers:
+        - name: db-lobsters
+          image: mysql:5.7 
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: db_username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: db_password
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: db_password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: lobsters
+                  key: db_db
+            - name: MYSQL_ROOT_HOSTNAME
+              value: '127.0.0.1' 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lobsters-db
+spec:
+  selector:
+    app: lobsters
+    service: db
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lobsters-web
+spec:
+  selector:
+    app: lobsters
+    service: web
+  ports:
+    - port: 80
+      targetPort: 3000
+---
+apiVersion: extensions/v1beta1 
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: lobsters-web
+              servicePort: 80
